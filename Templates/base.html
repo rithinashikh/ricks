@@ -195,7 +195,7 @@
       //console.log("Value"+value)
       $.ajax({
         type:"GET",
-        url:"http://127.0.0.1:8000/plus_cart",
+        url:"/plus_cart",
         data:{
           prod_id : id,
           //quant_value : value,
@@ -219,7 +219,7 @@
       var eml = this.parentNode.parentNode.parentNode.parentNode.children[4]
       $.ajax({
         type:"GET",
-        url:"http://127.0.0.1:8000/minus_cart",
+        url:"/minus_cart",
         data:{
           prod_id : id
         },
