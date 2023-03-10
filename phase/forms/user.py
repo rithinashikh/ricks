@@ -33,7 +33,7 @@ class UserSignupForm(forms.ModelForm):
         uname = self.cleaned_data['uname']
         if UserDetail.objects.filter(uname=uname).exists():
             raise ValidationError("This user already exists.")
-        if not re.match(r'^[A-Za-z]{4,8}$', uname):
+        if not re.match(r'^[A-Za-z0-9]{4,8}$', uname):
             raise ValidationError("Length of username must be between 4 to 8")
         return uname
 
@@ -47,11 +47,15 @@ class UserSignupForm(forms.ModelForm):
     
     def clean_upassword(self):
         upassword = self.cleaned_data['upassword']
-        if not re.match(r'^[A-Za-z]{4,8}$', upassword):
+        if not re.match(r'^[A-Za-z0-9]{4,8}$', upassword):
             raise ValidationError("Length of password must be between 4 to 8")
         return upassword
-
-
+    
+    def clean_uimage(self):
+        uimage = self.cleaned_data.get('uimage')
+        if not uimage:
+            raise forms.ValidationError('This field is required.')
+        return uimage
 
 
 class UserLoginForm(forms.ModelForm):
@@ -66,6 +70,11 @@ class UserLoginForm(forms.ModelForm):
             'uname':'User Name',
             'upassword':'Password',
         }
+    # def clean_uname(self):
+    #     uname = self.cleaned_data['uname']
+    #     if not UserDetail.objects.filter(uname=uname).exists():
+    #         raise ValidationError("This user already does not exists.")
+    #     return uname
 
 class UserAddressForm(forms.ModelForm):
     class Meta:

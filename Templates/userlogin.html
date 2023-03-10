@@ -16,8 +16,13 @@
             <form action="#" method="post">
               {% csrf_token %}
               <div class="p-3 p-lg-5 border">
-
-              {{fm.as_p}}
+                {% for fm in fm %}
+                  <div class="form-group row">
+                    <div class="col-md-12">
+                          {{fm.label_tag}}{{fm}} <small class="text-danger">{{fm.errors|striptags}}</small>
+                      </div>
+                    </div>
+                  {% endfor %}
               Or<a href="{% url 'userotplogin' %}">
                 Signin with OTP
               </a><br><br>

@@ -61,9 +61,13 @@
               {% for i in page_obj %}
               <div class="col-sm-6 col-lg-4 mb-4" data-aos="fade-up">
                 <div class="block-4 text-center border">
-                  <figure class="block-4-image">
-                    <a href="shop-single.html"><img src="{{i.image.url}}" alt="Image placeholder" class="img-fluid"></a>
-                  </figure>
+                  
+                    <a href="{% url 'shopsingle' %}?uid={{i.id}}">
+                      <figure class="block-4-image">
+                      <img src="{{i.image.url}}" alt="Image placeholder" class="img-fluid">
+                    </figure>
+                    </a>
+                  
                   <div class="block-4-text p-4">
                     <h3><a href="{% url 'shopsingle' %}?uid={{i.id}}">{{i.name}}</a></h3>
                     <p class="mb-0">{{i.description}}</p>

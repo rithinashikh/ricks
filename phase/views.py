@@ -55,6 +55,7 @@ class UserLoginView(View):
             request.session['uname'] = uname
             return redirect('shop')
         else:
+            messages.warning(request,'Incorrect password')
             return redirect('userlogin')
         
 class UserSignupView(View):
@@ -90,7 +91,7 @@ def shop(request):
             details3=Product.objects.filter(category__id=cat_id)          
         else:
             details3=Product.objects.all()
-        paginator = Paginator(details3, 3)
+        paginator = Paginator(details3, 9)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         return render(request, 'shop.html', {'page_obj': page_obj,'cat':cat})
@@ -150,7 +151,7 @@ def adminuserlist(request):
             member=UserDetail.objects.filter(uname__icontains=search)
         else:
             member=UserDetail.objects.all().order_by('-id')
-        paginator = Paginator(member, 2)
+        paginator = Paginator(member, 5)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         return render(request,'adminuserlist.html',{'page_obj': page_obj})
@@ -165,7 +166,7 @@ def adminproductlist(request):
             member=Product.objects.filter(name__icontains=search)
         else:
             member=Product.objects.all().order_by('-id')
-        paginator = Paginator(member, 2)
+        paginator = Paginator(member, 5)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         return render(request,'adminproductlist.html',{'page_obj': page_obj})
@@ -269,7 +270,7 @@ def admincategorylist(request):
             member=Category.objects.filter(name__icontains=search)
         else:
             member=Category.objects.all().order_by('-id')
-        paginator = Paginator(member, 2)
+        paginator = Paginator(member, 5)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         return render(request,'admincategorylist.html',{'page_obj': page_obj})
@@ -534,7 +535,7 @@ def order(request):
         user = request.session['uname']
         user = UserDetail.objects.get(uname = user)
         ord = Order.objects.filter(user=user).order_by('-id')
-        paginator = Paginator(ord, 2)
+        paginator = Paginator(ord, 5)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         return render(request,'order.html',{'page_obj':page_obj})
@@ -620,7 +621,7 @@ def adminorderlist(request):
             member=Order.objects.filter(Q(user__uname__icontains=search)|Q(id__icontains=search)).order_by('-id')
         else:
             member = Order.objects.all().order_by('-id')
-        paginator = Paginator(member, 2)
+        paginator = Paginator(member, 5)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         return render(request,'adminorderlist.html', {'page_obj': page_obj})
