@@ -370,12 +370,13 @@ def checkout(request):
                 check = request.POST.get('c_code')
                 uname=request.session['uname']
                 try:
-                    obj = Coupon.objects.get(user__uname=uname,is_active=True)
+                    obj = Coupon.objects.get(user__uname=uname,is_active=True,coupon_code=check)
                 except:
                     messages.warning(request,'No coupon')
                     return redirect('checkout')
                 if check==obj.coupon_code and obj.is_active:
-                    Coupon.objects.filter(user__uname=uname).update(applied=True)
+                    Coupon.objects.filter(user__uname=uname).update(applied=False)
+                    Coupon.objects.filter(user__uname=uname,is_active=True,coupon_code=check).update(applied=True)
                 elif check==obj.coupon_code:
                     messages.warning(request,'Coupon has expired') 
                 else:
@@ -406,7 +407,8 @@ def checkout(request):
                 ret = itemcalculate(use)
                 disc = ret['datap']['total']
                 applied_discount = disc - 0
-            return render(request, 'checkout.html', {'fm': fm, 'context': context, 'data':ret['data'], 'datap':ret['datap'],'coup':coup,'disc':applied_discount})
+            coupon = Coupon.objects.filter(user__uname=use,is_active=True)
+            return render(request, 'checkout.html', {'fm': fm, 'context': context, 'data':ret['data'], 'datap':ret['datap'],'coup':coup,'disc':applied_discount,'coupon':coupon})
     else:
         return redirect('userlogin')
 
@@ -807,43 +809,6 @@ def wishlistdelete(request,id):
     else:
         return redirect('userlogin')
 
-
-# def sales_report(request):
-#     if 'username' in request.session:
-#         buf = io.BytesIO()
-#         c = canvas.Canvas(buf,pagesize=letter, bottomup=1)
-#         textob = c.beginText()
-#         textob.setTextOrigin(inch, inch)
-#         textob.setFont("Helvetica", 16)
-#         if request.method == 'POST':    
-#             start_date = request.POST.get('start_date')
-#             end_date = request.POST.get('end_date')
-#             orders = Order.objects.all()
-#             if start_date and end_date:
-#                 start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
-#                 end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
-#                 orders = orders.order_by('-ordered_date').filter(ordered_date__range=[start_date, end_date])
-#             else:
-#                 orders = Order.objects.all().order_by('-order_date')               
-#             table_header = ["Customer Name", "Product Title", "Order Date and Time", "Order Status", "Payment Status"]            
-#             table_data = []
-#             for ord in orders:
-#                 row_data = [ord.address.user.uname, ord.product.name, str(ord.ordered_date), str(ord.status), str(ord.ordertype)]
-#                 table_data += [row_data]
-#             pdfTable = Table([table_header] +table_data)           
-#             pdfTableStyle = TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.lightblue)]) 
-#             pdfTable.setStyle(pdfTableStyle)
-#             pdfTable.wrapOn(c, 100, 100)
-#             pdfTable.drawOn(c, 10, 10 + 5)
-#             c.drawText(textob)
-#             c.showPage()
-#             c.save()
-#             buf.seek(0)
-#             return FileResponse(buf, as_attachment=True, filename="Sales report.pdf")
-#         else:
-#             return render(request,'sales_report.html')
-#     else:
-#         return redirect('userlogin')
     
 def cancelcoupon(request):
     uname = request.session['uname']

@@ -33,6 +33,7 @@
                         <!--
                         <th>Minimum Amount</th>-->
                         <th>User</th>
+                        <th>Applied</th>
                         <th>Update</th>
                         <th>Delete</th>
                     
@@ -48,6 +49,7 @@
                         <!--
                         <td>{{x.minimum_amount}}</td>-->
                         <td>{{x.user}}</td>
+                        <td>{{x.applied}}</td>
                         
                         <td>
                            <a href="{% url 'updatecoupon' %}?uid={{x.id}}" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>

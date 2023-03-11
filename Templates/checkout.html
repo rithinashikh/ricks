@@ -76,11 +76,17 @@
                   </div><br>
                   {% if coup.applied %}
                   <div>
-                  <p class="badge badge-info">{{ coup.coupon_code }} <a href="{% url 'cancelcoupon' %}" class="btn btn-danger">X</a></p>
-                  
+                  <p class="badge badge-info">{{ coup.coupon_code }} <a href="{% url 'cancelcoupon' %}" class="btn btn-danger">X</a></p>    
                   </div>
+                  {% else %} 
+                  <b class="text-black">Coupons:</b> 
+                  {% for c in coupon %}
+                  <span class="text-black">{{c.coupon_code}}</span>
+                  {% endfor %}
 
                   {% endif %}
+                  
+
       
                 </form>
                 </div>
