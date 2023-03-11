@@ -15,6 +15,7 @@
         <div class="row mb-5">
           <form class="col-md-12" method="post">
             <div class="site-blocks-table">
+              
               <table class="table table-bordered">
                 <thead>
                   <tr>
@@ -28,7 +29,7 @@
                     <th class="product-total">Order Type</th>
                     <th class="product-total">Status</th>
                     <th class="product-total">Action</th>
-                    <!--<th class="product-total">Invoice</th>-->
+                  
 
                   </tr>
                 </thead>
@@ -118,17 +119,14 @@
                       {% elif i.status == "Cancel Requested" %}
                       <p><b>Requested.</b></p>
                       {% elif i.status == "Cancelled" or i.status == "Returned"  %}
-                      <p><b>Initiated.</b></p>
+                      <p><b>---</b></p>
                       {% else %}
-                      <p><b>Initiated.</b></p>
+                      <p><b>---</b></p>
                       {% endif %}
 
 
                     </td>
-                    <!--
-                    <td>
-                      <a href="">PDF</a>
-                    </td>-->
+
                     
 
                   </tr>

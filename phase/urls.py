@@ -63,5 +63,5 @@ urlpatterns = [
     path('adminaddbanner/', views.adminaddbanner, name='adminaddbanner'),
     path('adminbannerlist/', views.adminbannerlist, name='adminbannerlist'),
     path('deletebanner/', views.deletebanner, name='deletebanner'),
-    # path('download/', views.download, name='download'),
+    path('empty/', views.empty, name='empty'),
 ]

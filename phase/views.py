@@ -385,14 +385,27 @@ def checkout(request):
         else:
             fm = UserAddressForm()
             use = request.session['uname']
+            # try:
             context=Address.objects.filter(user__uname = use).order_by('-id')
+            # except:
+            #     messages.warning(request,'There is no valid address')
+            #     return redirect('checkout')
             try:
                 coup = Coupon.objects.get(user__uname=use,is_active=True,applied=True)
+                ret = itemcalculate(use)
+                disc = ret['datap']['total']
+                applied_discount = disc - coup.discount_price
+            except Coupon.DoesNotExist:
+                coup = None
+                ret = itemcalculate(use)
+                disc = ret['datap']['total']
+                applied_discount = disc - 0
             except:
                 coup = Coupon.objects.get(user__uname=use,is_active=True)
-            ret = itemcalculate(use)
-            disc = ret['datap']['total']
-            applied_discount = disc - coup.discount_price
+                # messages.warning(request,'This coupon is expired')
+                ret = itemcalculate(use)
+                disc = ret['datap']['total']
+                applied_discount = disc - 0
             return render(request, 'checkout.html', {'fm': fm, 'context': context, 'data':ret['data'], 'datap':ret['datap'],'coup':coup,'disc':applied_discount})
     else:
         return redirect('userlogin')
@@ -499,9 +512,16 @@ def cart(request):
     if 'uname' in request.session:
         name=request.session['uname']
         ret = itemcalculate(name)
-        return render(request,'cart.html',ret)
+        if ret['datap']['quantity'] > 0:
+            return render(request,'cart.html',ret)
+        else:
+            messages.warning(request,'No items in cart')
+            return redirect('empty')
     else:
         return redirect('userlogin')
+    
+def empty(request):
+    return render(request, 'empty.html')
 
 def delcartitems(request):
     if 'uname' in request.session:
@@ -538,7 +558,11 @@ def order(request):
         paginator = Paginator(ord, 5)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
-        return render(request,'order.html',{'page_obj':page_obj})
+        if ord.exists():
+            return render(request,'order.html',{'page_obj':page_obj})
+        else:
+            messages.warning(request,'No orders found')
+            return redirect('empty')
     else:
         return redirect('userlogin')
 
@@ -546,7 +570,11 @@ def orderconfirm(request):
     if 'uname' in request.session:    
         user = request.session['uname']
         use1 = UserDetail.objects.get(uname = user)
-        use2 = Address.objects.get(user=use1,selected=True)
+        try:
+            use2 = Address.objects.get(user=use1,selected=True)
+        except:
+            messages.warning(request,'No address specified')
+            return redirect('checkout')
         cart = CartItem.objects.filter(cart__user__uname=use1)
         try:
             coupon = Coupon.objects.get(user=use1,is_active=True,applied=True)
@@ -761,9 +789,15 @@ def wishlist(request):
                 wish_items = Wishlist.objects.all().order_by('-id')
         else:
             wish_items = Wishlist.objects.all().order_by('-id')
-        return render(request,'wishlist.html',{'wish_items':wish_items})
+        if wish_items.exists():
+            return render(request,'wishlist.html',{'wish_items':wish_items})
+        else:
+            messages.warning(request,'No items in wishlist')
+            return redirect('empty')
     else:
         return redirect('userlogin')
+    
+
 
 
 def wishlistdelete(request,id):
