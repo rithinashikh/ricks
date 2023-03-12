@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect
 from phase.forms.user import UserSignupForm, UserLoginForm, UserAddressForm, OrderForm
 from phase.forms.product import ProductForm, CouponForm, BannerForm
 from phase.forms.category import CategoryForm
-# from phase.forms.coupon import CouponForm 
 from .models import UserDetail, Product, Category, Cart, CartItem, Address, Order, Coupon, Wishlist, Banner
 from django.contrib.auth.models import User
 import requests, random
@@ -28,6 +27,17 @@ from django.template.loader import render_to_string
 from xhtml2pdf import pisa
 import os 
 import datetime
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+import requests
+from django.template.loader import get_template
+import openpyxl
+import pytz
+from datetime import datetime
+from django.db import models
+from django.db.models import Sum
+from io import BytesIO
+import pandas as pd
 
 def index(request):
     obj = Banner.objects.all()
@@ -541,7 +551,11 @@ def paypal(request):
     if 'uname' in request.session:
         user = request.session['uname']
         use1 = UserDetail.objects.get(uname = user)
-        use2 = Address.objects.get(user=use1,selected=True)
+        try:
+            use2 = Address.objects.get(user=use1,selected=True)
+        except:
+            messages.warning(request,'No address specified')
+            return redirect('checkout')
         cart = CartItem.objects.filter(cart__user__uname=use1)
         for c in cart:
             Order(user=use1, address=use2, product=c.product, amount=c.subtotal, ordertype= 'Paypal').save()
@@ -965,41 +979,35 @@ def generateinvoice(request):
        return HttpResponse('We had some errors <pre>' + html + '</pre>')
     return response
 
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
-import requests
-from django.template.loader import get_template
-import openpyxl
-import pytz
-from datetime import datetime
-from django.db import models
-from django.db.models import Sum
-from io import BytesIO
-import pandas as pd
 
 def sales_report(request):
     if request.method == 'POST':    
         start_date = request.POST.get('start_date')
         end_date = request.POST.get('end_date')
         generate = request.POST.get('generate')
+        if not start_date or not end_date:
+            messages.warning(request, 'Check dates')
+            return redirect('sales_report')
         if end_date < start_date:
             messages.warning(request, 'start date is not less than end date')
             return redirect('sales_report')
-        else:
+        elif end_date >= start_date:
             if generate=='PDF':
                 buf = io.BytesIO()
                 c = canvas.Canvas(buf,pagesize=letter, bottomup=1)
                 textob = c.beginText()
                 textob.setTextOrigin(inch, inch)
                 textob.setFont("Helvetica", 16)
-
                 orders = Order.objects.all()
                 if start_date and end_date:
                     start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
                     end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
                     orders = orders.order_by('-ordered_date').filter(ordered_date__range=[start_date, end_date])
                 else:
-                    orders = Order.objects.all().order_by('-order_date')               
+                    orders = Order.objects.all().order_by('-order_date')
+                if not orders.exists():
+                    messages.warning(request,'No data found')
+                    return redirect('sales_report')           
                 table_header = ["Customer Name", "Product Title", "Order Date and Time", "Order Status", "Payment Status"]            
                 table_data = []
                 for ord in orders:
@@ -1018,6 +1026,9 @@ def sales_report(request):
 
             else:
                 orders = Order.objects.filter(ordered_date__range=[start_date, end_date])
+                if not orders.exists():
+                    messages.warning(request,'No data found')
+                    return redirect('sales_report') 
                 orders_df = pd.DataFrame(list(orders.values()))
                 try:
                     orders_df.drop(['user_id', 'address_id'], axis=1, inplace=True)
@@ -1030,6 +1041,9 @@ def sales_report(request):
                 response['Content-Disposition'] = 'attachment; filename=orders.xlsx'
                 orders_df.to_excel(response, index=False)
                 return response   
+            
+        else:
+            print("!!!!unwanted")
     else:
         return render(request,'sales_report.html')
         

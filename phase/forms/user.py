@@ -108,7 +108,7 @@ class UserAddressForm(forms.ModelForm):
     def clean_zipcode(self):
         zipcode = self.cleaned_data['zipcode']
         if not re.match(r'^\d{6}$', str(zipcode)):
-            raise ValidationError("Zip code must be 6 digits.")
+            raise ValidationError("Enter a valid zipcode.")
         return zipcode
 
 

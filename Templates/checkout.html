@@ -137,7 +137,7 @@
                     
                     <button class="btn btn-primary btn-lg py-3 btn-block" onclick="window.location='{% url 'orderconfirm' %}'">Cash on delivery</button><br>
          
-                    <script src="https://www.paypal.com/sdk/js?client-id=AZaPN7_Fio6OvIK3JhE0xGlshCED-Zgi2TM4ubK7-Yqq_b3N2HbZEKfzltaqaUxpevu_Y9OSohlHuIK5&currency=USD&disable-funding=credit"></script>
+                    <script src="https://www.paypal.com/sdk/js?client-id=AZaPN7_Fio6OvIK3JhE0xGlshCED-Zgi2TM4ubK7-Yqq_b3N2HbZEKfzltaqaUxpevu_Y9OSohlHuIK5&currency=USD&disable-funding=card"></script>
                     <form action="{% url 'paypal' %}" id="paypalform" name="paypalform">
                       <div id="paypal-button-container"></form></div>
 
