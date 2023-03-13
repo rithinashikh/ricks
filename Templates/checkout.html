@@ -142,12 +142,12 @@
                       <div id="paypal-button-container"></form></div>
 
                       <script>
-                        var amount = '{{datap.total}}'
+                        var amount = {% if coup.applied %}'{{disc}}' {% else %}'{{datap.total}}'{% endif %} 
                         // Render the PayPal button into #paypal-button-container
                         paypal.Buttons({
         
                           style : {
-                                  color:'blue',
+                                  color:'black',
                                   
                           },
         
