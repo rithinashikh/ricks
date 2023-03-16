@@ -41,6 +41,7 @@ class Coupon(models.Model):
     discount_price=models.IntegerField(default=0)
     minimum_amount=models.IntegerField(default=500)
     applied=models.BooleanField(default=False)
+    description = models.CharField(max_length=200,null=True,default='Sample')
     user=models.ForeignKey(UserDetail, on_delete=models.CASCADE, null=False)
     def __str__(self):
         return self.coupon_code

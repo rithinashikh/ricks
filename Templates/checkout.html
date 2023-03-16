@@ -74,17 +74,14 @@
                       <button class="btn btn-primary btn-sm" type="submit" id="button-addon2" name="couponform">Apply</button>    
                     </div>     
                   </div><br>
+                  <a type="button" data-toggle="modal"href="#exampleModalScrollable1">Show all coupons</a>
                   {% if coup.applied %}
                   <div>
                   <p class="badge badge-info">{{ coup.coupon_code }} <a href="{% url 'cancelcoupon' %}" class="btn btn-danger">X</a></p>    
                   </div>
-                  {% else %} 
-                  <b class="text-black">Coupons:</b> 
-                  {% for c in coupon %}
-                  <span class="text-black">{{c.coupon_code}}</span>
-                  {% endfor %}
 
                   {% endif %}
+                  
                   
 
       
@@ -192,5 +189,43 @@
         <!-- </form> -->
       </div>
     </div>
+
+    
+
+    <!-- Coupon Model  -->
+    <div class="modal fade" id="exampleModalScrollable1" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title text-black" id="exampleModalScrollableTitle">Coupons</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <input type="hidden" id="total" value="<%=coupon.length %>">
+          {% for i in coupon  %}
+            <div class="form-group row">
+              <div class="col-md-12">
+                <span style="color: crimson;font-size:x-large;"><strong id="{{i.id}}">{{i.coupon_code}}</strong></span>
+                <p class="text-black"><b>Details:</b> {{i.description}}</p>
+                <p class="text-black"><b>Min order value:</b> {{ i.minimum_amount }}</p>
+              </div>
+
+              
+
+            
+          </div>
+          <hr>
+          {% endfor %}
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <!-- <button type="submit" class="btn btn-primary">Save changes</button> -->
+          </div>
+        </div>
+      </div>
+    </div> 
+   </div>
+
 
     {% endblock %}

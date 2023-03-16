@@ -97,8 +97,13 @@ def shop(request):
     if 'uname' in request.session:
         cat=Category.objects.all()
         cat_id = request.GET.get('cat_id')
-        if cat_id is not None:
-            details3=Product.objects.filter(category__id=cat_id)          
+        prod = request.GET.get('prod_id')
+        if cat_id is not None and prod is None:
+            details3=Product.objects.filter(category__id=cat_id)
+        elif prod is not None and cat_id is None:
+            details3=Product.objects.filter(name__icontains=prod)      
+        elif prod is not None and cat_id is not None:
+            details3=Product.objects.filter(name__icontains=prod,category__id=cat_id)
         else:
             details3=Product.objects.all()
         paginator = Paginator(details3, 9)
@@ -617,9 +622,6 @@ def plus_cart(request):
         Product.objects.filter(id=prod_id).update(stock=F('stock') - 1)
         d = CartItem.objects.get(Q(product=prod_id) & Q(cart__user=user))
         sub = d.subtotal
-        if sub<=0:
-            print("!!!!Cart is almost empty")
-            return redirect("empty")
         ret = itemcalculate(use)
         datap = {
             'total': ret['datap']['total'],
@@ -962,7 +964,6 @@ def generateinvoice(request):
         'amount' : ordered_product.amount,
         'ordertype': ordered_product.ordertype,
     } 
-    print("DATAAAA",data)
     template_path = 'invoicepdf.html'
     context = {
         # 'date': data['date'],
@@ -1047,7 +1048,7 @@ def sales_report(request):
                 return response   
             
         else:
-            print("!!!!unwanted")
+            print("!!Unidentified")
     else:
         return render(request,'sales_report.html')
         

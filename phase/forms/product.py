@@ -39,12 +39,13 @@ class ProductForm(forms.ModelForm):
 class CouponForm(forms.ModelForm):
     class Meta:
         model = Coupon
-        fields = ['coupon_code', 'is_active', 'discount_price', 'minimum_amount', 'user']
+        fields = ['coupon_code', 'is_active', 'discount_price', 'minimum_amount', 'user','description']
         labels = {
             'coupon_code': 'Coupon Code',
             'is_active': 'Is Active',
             'discount_price': 'Discount Price',
             'minimum_amount': 'Minimum Amount',
+            'description': 'description',
             'user': 'User',
         }
         widgets = {
@@ -52,6 +53,7 @@ class CouponForm(forms.ModelForm):
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'discount_price': forms.NumberInput(attrs={'class': 'form-control'}),
             'minimum_amount': forms.NumberInput(attrs={'class': 'form-control'}),
+            'description': forms.TextInput(attrs={'class': 'form-control'}),
             'user': forms.Select(attrs={'class': 'form-control'}),
         }
 
