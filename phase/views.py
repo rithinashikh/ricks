@@ -391,16 +391,13 @@ def checkout(request):
                     messages.warning(request,'Coupon has expired') 
                 else:
                     messages.warning(request,'Coupon is not valid')
-                    # return redirect('checkout')
                 return redirect('checkout')            
         else:
             fm = UserAddressForm()
             use = request.session['uname']
-            # try:
+
             context=Address.objects.filter(user__uname = use).order_by('-id')
-            # except:
-            #     messages.warning(request,'There is no valid address')
-            #     return redirect('checkout')
+
             try:
                 coup = Coupon.objects.get(user__uname=use,is_active=True,applied=True)
                 ret = itemcalculate(use)
@@ -413,10 +410,12 @@ def checkout(request):
                 applied_discount = disc - 0
             except:
                 coup = Coupon.objects.get(user__uname=use,is_active=True)
-                # messages.warning(request,'This coupon is expired')
                 ret = itemcalculate(use)
                 disc = ret['datap']['total']
                 applied_discount = disc - 0
+            if disc<=0:
+                messages.warning(request,'Order total is less than or equal to zero')
+                return redirect('cart')
             coupon = Coupon.objects.filter(user__uname=use,is_active=True)
             return render(request, 'checkout.html', {'fm': fm, 'context': context, 'data':ret['data'], 'datap':ret['datap'],'coup':coup,'disc':applied_discount,'coupon':coupon})
     else:
@@ -508,7 +507,7 @@ def itemcalculate(name):
     set1=UserDetail.objects.filter(uname=name).first()
     set2=set1.id
     data=CartItem.objects.filter(cart__user__id=set2)
-    datat=CartItem.objects.filter(cart__user__id=set2)
+    # datat=CartItem.objects.filter(cart__user__id=set2)
     for d in data:
         x=int(d.product.price)
         y=int(d.quantity)
@@ -527,6 +526,8 @@ def cart(request):
         if ret['datap']['quantity'] > 0:
             return render(request,'cart.html',ret)
         else:
+            set=UserDetail.objects.filter(uname=name).first()
+            CartItem.objects.filter(cart__user__id=set.id).delete()
             messages.warning(request,'No items in cart')
             return redirect('empty')
     else:
@@ -616,6 +617,9 @@ def plus_cart(request):
         Product.objects.filter(id=prod_id).update(stock=F('stock') - 1)
         d = CartItem.objects.get(Q(product=prod_id) & Q(cart__user=user))
         sub = d.subtotal
+        if sub<=0:
+            print("!!!!Cart is almost empty")
+            return redirect("empty")
         ret = itemcalculate(use)
         datap = {
             'total': ret['datap']['total'],

@@ -72,7 +72,7 @@
                     <h3><a href="{% url 'shopsingle' %}?uid={{i.id}}">{{i.name}}</a></h3>
                     <p class="mb-0">{{i.description}}</p>
                     {% if i.category.offer_active %}
-                    <p><s>₹{{i.normalprice}}</s></p>
+                    <p class="font-weight-bold">Price: <s>₹{{i.normalprice}}</s></p>
                     <p class="text-primary font-weight-bold">Offer Price ₹ {{i.price}}</p>
                     {% else %}
                     <p class="text-primary font-weight-bold">₹ {{i.price}}</p>
@@ -131,13 +131,14 @@
                 {% endfor %}
               </ul>
             </div>
-
+            
+            <!--
             <div class="border p-4 rounded mb-4">
-              <!--
-              -->
+              
+          
 
               <div class="mb-4">
-                <!--
+                
                 <h3 class="mb-3 h6 text-uppercase text-black d-block">Price</h3>
                 <label for="s_sm" class="d-flex">
                   <input type="checkbox" id="s_sm" class="mr-2 mt-1"> <span class="text-black">0 to 1000</span>
@@ -148,13 +149,13 @@
                 <label for="s_lg" class="d-flex">
                   <input type="checkbox" id="s_lg" class="mr-2 mt-1"> <span class="text-black">5000-Above</span>
                 </label>
-              -->
+              
               </div>
-              <!--
+              
 
-              -->
+              
 
-            </div>
+            </div>-->
           </div>
         </div>
 
