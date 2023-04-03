@@ -38,6 +38,7 @@ from django.db import models
 from django.db.models import Sum
 from io import BytesIO
 import pandas as pd
+import razorpay
 
 def index(request):
     obj = Banner.objects.all()
@@ -353,14 +354,14 @@ def otplogin(request):
     else:
         otp_sent = random.randint(1001, 9999)
         UserDetail.objects.filter(uname=uname).update(uotp=otp_sent) 
-        # url = 'https://www.fast2sms.com/dev/bulkV2'
-        # payload = f'sender_id=TXTIND&message={otp_sent}&route=v3&language=english&numbers={obj.uphone}'
-        # headers = {
-        #     'authorization': "xoiObB7WLa4GvY0uPZ6J9KmS1kXQCA2MeRhpzfTHN5sy8dctVDo5mkyeX9CRJxBKzu8M7FZ0stfh2gdi",
-        #     'Content-Type': "application/x-www-form-urlencoded"
-        #     }
-        # response = requests.request("POST", url, data=payload, headers=headers)
-        # print(response.text) 
+        url = 'https://www.fast2sms.com/dev/bulkV2'
+        payload = f'sender_id=TXTIND&message={otp_sent}&route=v3&language=english&numbers={obj.uphone}'
+        headers = {
+            'authorization': "xoiObB7WLa4GvY0uPZ6J9KmS1kXQCA2MeRhpzfTHN5sy8dctVDo5mkyeX9CRJxBKzu8M7FZ0stfh2gdi",
+            'Content-Type': "application/x-www-form-urlencoded"
+            }
+        response = requests.request("POST", url, data=payload, headers=headers)
+        print(response.text) 
         print("Sent value::",otp_sent)
     return render(request, 'otp.html')
 
@@ -554,6 +555,7 @@ def delcartitems(request):
         return redirect('userlogin')
 
 def paypal(request):
+    
     if 'uname' in request.session:
         user = request.session['uname']
         use1 = UserDetail.objects.get(uname = user)
@@ -569,6 +571,42 @@ def paypal(request):
         return render(request,'orderconfirm.html')
     else:
         return redirect('userlogin')
+
+    
+def razorpay(request):
+    client = razorpay.Client(auth=("rzp_test_RRhMTrJphOc3D7", "cUn8l52mELGhaXlORvWpzADe"))
+    DATA = {
+        "amount": 100 ,
+        "currency": "INR",
+        "receipt": "receipt#1",
+        "notes": {
+            "key1": "value3",
+            "key2": "value2"
+        }
+    }
+
+    razorpay_response=client.order.create(data=DATA)
+
+    reazorpay_status=razorpay_response['status']
+    if reazorpay_status == 'created':
+        if 'uname' in request.session:
+            user = request.session['uname']
+            use1 = UserDetail.objects.get(uname = user)
+            try:
+                use2 = Address.objects.get(user=use1,selected=True)
+            except:
+                messages.warning(request,'No address specified')
+                return redirect('checkout')
+            cart = CartItem.objects.filter(cart__user__uname=use1)
+            for c in cart:
+                Order(user=use1, address=use2, product=c.product, amount=c.subtotal, ordertype= 'Razorpay').save()
+                c.delete()
+            return render(request,'orderconfirm.html')
+        else:
+            return redirect('userlogin')
+    else:
+        messages.warning(request,'Something wrong')
+        return redirect('shop')
 
 
 

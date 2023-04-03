@@ -64,4 +64,6 @@ urlpatterns = [
     path('adminbannerlist/', views.adminbannerlist, name='adminbannerlist'),
     path('deletebanner/', views.deletebanner, name='deletebanner'),
     path('empty/', views.empty, name='empty'),
+    path('razorpay/', views.razorpay, name='razorpay'),
+
 ]
